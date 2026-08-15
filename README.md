@@ -615,18 +615,17 @@ The `.fde/` workspace can be consumed by:
 - internal coding agents;
 - future MCP clients.
 
-A later release may expose an MCP server with tools such as:
+Two commands serve this directly:
 
-```text
-get_engagement
-get_environment
-get_integrations
-get_constraints
-run_preflight
-get_decisions
-get_incidents
-get_handoff
+```bash
+fde export context   # one Markdown + JSON bundle to paste into any agent
+fde mcp              # read-only MCP server (stdio, opt-in)
 ```
+
+The MCP server exposes `get_engagement`, `get_environment`,
+`get_integrations`, `get_constraints`, and `run_preflight` — all read-only;
+no tool can mutate the workspace. Later releases may add `get_decisions`,
+`get_incidents`, and `get_handoff`.
 
 ---
 

@@ -149,9 +149,9 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 ### 2.4 Agent context export + MCP
 
-- [ ] `fde export context` → single Markdown/JSON bundle for Claude Code / Cursor / Codex (engagement, inventory, graph, findings)
-- [ ] MCP server exposing read-only tools: `get_engagement`, `get_environment`, `get_integrations`, `get_constraints`, `run_preflight`
-- [ ] MCP server is opt-in, local (stdio), read-only; no tool may mutate the workspace
+- [x] `fde export context` → single Markdown/JSON bundle for Claude Code / Cursor / Codex (engagement, inventory, graph, findings)
+- [x] MCP server exposing read-only tools: `get_engagement`, `get_environment`, `get_integrations`, `get_constraints`, `run_preflight`
+- [x] MCP server is opt-in, local (stdio), read-only; no tool may mutate the workspace (`run_preflight` computes in memory; verified via live stdio round-trip test)
 
 **Exit criterion:** for a repo with a declared agent, OpenFDE can show what the agent may touch, flag unapproved side effects, and hand a coding agent the full engagement context via one export or MCP.
 

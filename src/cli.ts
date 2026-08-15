@@ -8,6 +8,8 @@ import { checkCommand } from "./commands/check.js";
 import { reportCommand } from "./commands/report.js";
 import { validateCommand } from "./commands/validate.js";
 import { testCommand } from "./commands/test.js";
+import { exportCommand } from "./commands/export.js";
+import { mcpCommand } from "./commands/mcp.js";
 import { VERSION } from "./version.js";
 
 const program = new Command();
@@ -39,6 +41,17 @@ program
   .action(async (root, options) => {
     await testCommand(normalize(root), options);
   });
+program
+  .command("export")
+  .description("Export engagement artifacts (currently: context)")
+  .argument("<target>", "what to export: context")
+  .argument("[root]")
+  .action(async (target, root) => exportCommand(normalize(root), target));
+program
+  .command("mcp")
+  .description("Serve the engagement over MCP (stdio, read-only, opt-in)")
+  .argument("[root]")
+  .action(async (root) => mcpCommand(normalize(root)));
 program.command("report").argument("[root]").action(async (root) => reportCommand(normalize(root)));
 
 program.parseAsync().catch((error) => {

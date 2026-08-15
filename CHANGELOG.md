@@ -36,6 +36,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tests: golden-file suite for all generated artifacts and a per-family
   scanner false-positive regression suite.
 
+- Agent deployment validation (v0.3 scope): `spec.agents` declarations
+  (tools, per-tool access, side-effect and PII flags), `agent → tool →
+  system` graph edges, and checks `agent-side-effect-unapproved`,
+  `agent-access-exceeds-boundary`, `agent-tool-system-undeclared`.
+- Eval declarations: `spec.evaluation.suites` with existence and freshness
+  checks (`eval-artifact-missing`, `eval-artifact-stale`); conventions in
+  `docs/EVALS.md`.
+- Contract tests: `.fde/contracts/` fixture format (`docs/CONTRACT_TESTS.md`)
+  and `fde test --contracts`.
+- `fde export context`: one Markdown + JSON engagement bundle for coding
+  agents.
+- `fde mcp`: opt-in, local, read-only MCP server (stdio) exposing
+  `get_engagement`, `get_environment`, `get_integrations`,
+  `get_constraints`, `run_preflight`.
+
 ### Fixed
 
 - The AWS content signature matched inside words (e.g. `flaws_found`).
