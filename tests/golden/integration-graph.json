@@ -1,0 +1,55 @@
+{
+  "generatedAt": "<TIMESTAMP>",
+  "nodes": [
+    {
+      "id": "app",
+      "label": "golden-fixture",
+      "category": "other"
+    },
+    {
+      "id": "nodejs",
+      "label": "Node.js",
+      "category": "runtime"
+    },
+    {
+      "id": "terraform",
+      "label": "Terraform",
+      "category": "infrastructure"
+    },
+    {
+      "id": "postgres",
+      "label": "PostgreSQL",
+      "category": "data"
+    },
+    {
+      "id": "aws",
+      "label": "AWS",
+      "category": "cloud"
+    },
+    {
+      "id": "openai",
+      "label": "OpenAI",
+      "category": "ai"
+    }
+  ],
+  "edges": [
+    {
+      "from": "app",
+      "to": "postgres",
+      "relationship": "uses",
+      "access": "read_only"
+    },
+    {
+      "from": "app",
+      "to": "aws",
+      "relationship": "uses",
+      "access": "unknown"
+    },
+    {
+      "from": "app",
+      "to": "openai",
+      "relationship": "uses",
+      "access": "unknown"
+    }
+  ]
+}

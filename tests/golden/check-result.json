@@ -1,0 +1,72 @@
+{
+  "generatedAt": "<TIMESTAMP>",
+  "overallScore": 81,
+  "scores": {
+    "security": 65,
+    "data": 65,
+    "reliability": 85,
+    "evaluation": 85,
+    "observability": 85,
+    "human_control": 100
+  },
+  "findings": [
+    {
+      "id": "observability-not-detected",
+      "title": "No observability signal detected",
+      "severity": "warning",
+      "category": "observability",
+      "explanation": "No Sentry or OpenTelemetry reference was found in the scanned repository, and no observability system is declared in the engagement.",
+      "evidence": [
+        "Scanned <ROOT> without an observability match",
+        "fde.yaml: no spec.systems entry of an observability type"
+      ],
+      "recommendation": "Add tracing/error monitoring, or declare the customer's observability system in fde.yaml."
+    },
+    {
+      "id": "evaluation-not-declared",
+      "title": "Evaluation is not declared",
+      "severity": "warning",
+      "category": "evaluation",
+      "explanation": "No evaluation requirement is declared for the engagement (spec.evaluation).",
+      "evidence": [
+        "fde.yaml: spec.evaluation is not set"
+      ],
+      "recommendation": "Define at least one task-success or regression evaluation before production."
+    },
+    {
+      "id": "reliability-policy-absent",
+      "title": "Reliability controls are not declared",
+      "severity": "warning",
+      "category": "reliability",
+      "explanation": "The engagement does not declare: timeout, retry, fallback (spec.reliability).",
+      "evidence": [
+        "fde.yaml: spec.reliability.timeout is not set",
+        "fde.yaml: spec.reliability.retry is not set",
+        "fde.yaml: spec.reliability.fallback is not set"
+      ],
+      "recommendation": "Declare timeout, retry, and fallback expectations for external dependencies and model calls."
+    },
+    {
+      "id": "data-residency-violation",
+      "title": "Infrastructure config references regions outside the declared residency boundary",
+      "severity": "critical",
+      "category": "data",
+      "explanation": "spec.constraints.dataResidency.allowedRegions declares ap-southeast-1, but the repository configures: us-east-1.",
+      "evidence": [
+        "main.tf:2: region us-east-1"
+      ],
+      "recommendation": "Move the workload into an allowed region, or update spec.constraints.dataResidency.allowedRegions after confirming the boundary with the customer."
+    },
+    {
+      "id": "write-boundary-violation",
+      "title": "Declared read_only system \"primary_db\" has write-implying code signals",
+      "severity": "critical",
+      "category": "security",
+      "explanation": "fde.yaml declares system \"primary_db\" (type postgres) as read_only, but the repository contains code that appears to write to a postgres system. Each signal is a named heuristic, not proof — verify before deploying.",
+      "evidence": [
+        "src/db.ts:1 — SQL INSERT/UPDATE/DELETE"
+      ],
+      "recommendation": "Either remove the write path, or change the declared access to read_write after confirming the boundary with the customer."
+    }
+  ]
+}

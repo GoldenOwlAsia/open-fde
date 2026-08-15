@@ -67,7 +67,7 @@ export const builtinFileSignatures: FileSignature[] = [
 export const builtinContentSignatures: ContentSignature[] = [
   { id: "postgres", name: "PostgreSQL", category: "data", pattern: /postgres|pgvector|\bpg\b/i },
   { id: "redis", name: "Redis", category: "data", pattern: /\bredis\b/i },
-  { id: "aws", name: "AWS", category: "cloud", pattern: /aws-sdk|@aws-sdk|boto3|provider\s+"aws"|aws_/i },
+  { id: "aws", name: "AWS", category: "cloud", pattern: /aws-sdk|@aws-sdk|boto3|provider\s+"aws"|\baws_/i },
   { id: "openai", name: "OpenAI", category: "ai", pattern: /openai/i },
   { id: "anthropic", name: "Anthropic", category: "ai", pattern: /anthropic/i },
   { id: "sentry", name: "Sentry", category: "observability", pattern: /sentry/i },

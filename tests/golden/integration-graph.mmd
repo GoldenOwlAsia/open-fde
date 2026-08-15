@@ -1,0 +1,10 @@
+flowchart LR
+  app["golden-fixture"]
+  nodejs["Node.js"]
+  terraform["Terraform"]
+  postgres["PostgreSQL"]
+  aws["AWS"]
+  openai["OpenAI"]
+  app -->|uses (read_only)| postgres
+  app -->|uses| aws
+  app -->|uses| openai

@@ -1,0 +1,74 @@
+{
+  "generatedAt": "<TIMESTAMP>",
+  "root": "<ROOT>",
+  "components": [
+    {
+      "id": "nodejs",
+      "name": "Node.js",
+      "category": "runtime",
+      "evidence": [
+        "package.json"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "terraform",
+      "name": "Terraform",
+      "category": "infrastructure",
+      "evidence": [
+        "main.tf"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "postgres",
+      "name": "PostgreSQL",
+      "category": "data",
+      "evidence": [
+        "package.json"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "aws",
+      "name": "AWS",
+      "category": "cloud",
+      "evidence": [
+        "main.tf"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "category": "ai",
+      "evidence": [
+        "package.json"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "signals": {
+    "regions": [
+      {
+        "region": "us-east-1",
+        "evidence": "main.tf:2"
+      }
+    ],
+    "secretSuspects": [],
+    "writeSignals": [
+      {
+        "systemType": "postgres",
+        "file": "src/db.ts",
+        "line": 1,
+        "pattern": "SQL INSERT/UPDATE/DELETE"
+      },
+      {
+        "systemType": "mysql",
+        "file": "src/db.ts",
+        "line": 1,
+        "pattern": "SQL INSERT/UPDATE/DELETE"
+      }
+    ]
+  }
+}
