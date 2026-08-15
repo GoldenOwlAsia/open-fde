@@ -7,7 +7,11 @@ const OPEN_QUESTIONS: Record<string, string> = {
   "human-approval-undefined": "Which side-effecting actions require human approval before execution?",
   "observability-not-detected": "How will errors and traces be observed in the customer environment?",
   "evaluation-not-declared": "What evaluation must pass before this system reaches production?",
-  "reliability-policy-absent": "What timeout, retry, and fallback behavior is expected for external calls?"
+  "reliability-policy-absent": "What timeout, retry, and fallback behavior is expected for external calls?",
+  "data-residency-violation": "Which regions may customer data and workloads run in?",
+  "secrets-committed": "How should secrets be provisioned and rotated in this environment?",
+  "write-boundary-violation": "Which systems may the deployment write to, and who approves widening that boundary?",
+  "success-metrics-undeclared": "What measurable outcome defines success for this engagement?"
 };
 
 function renderFinding(finding: Finding): string {

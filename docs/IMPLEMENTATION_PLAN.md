@@ -95,17 +95,17 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 ### 1.2 Richer constraints
 
-- [ ] Data residency check: declared `allowedRegions` vs regions found in Terraform/K8s config
-- [ ] Secrets hygiene check: `.env` committed, obvious credential patterns in tracked files (report file + line, never print the secret value)
-- [ ] Write-boundary check: declared `access: read_only` systems vs write-implying code signals
-- [ ] Success metrics declared check (at least one measurable metric)
+- [x] Data residency check: declared `allowedRegions` vs regions found in Terraform/K8s config
+- [x] Secrets hygiene check: `.env` committed, obvious credential patterns in tracked files (report file + line, never print the secret value)
+- [x] Write-boundary check: declared `access: read_only` systems vs write-implying code signals
+- [x] Success metrics declared check (at least one measurable metric)
 
 ### 1.3 Check packs
 
-- [ ] Internal check registry: each check = `{ id, category, appliesTo, run(context) }` (keeps plugin boundary clean per `PLUGIN_MODEL.md`, still no dynamic loading)
-- [ ] `fde check --only <ids>` / `--skip <ids>`
-- [ ] Severity overrides in `fde.yaml` (e.g. downgrade a check the customer has accepted, with a required `reason` field)
-- [ ] Tests: registry selection, overrides require reasons
+- [x] Internal check registry: each check = `{ id, category, appliesTo, run(context) }` (keeps plugin boundary clean per `PLUGIN_MODEL.md`, still no dynamic loading)
+- [x] `fde check --only <ids>` / `--skip <ids>`
+- [x] Severity overrides in `fde.yaml` (e.g. downgrade a check the customer has accepted, with a required `reason` field)
+- [x] Tests: registry selection, overrides require reasons
 
 ### 1.4 CI integration
 

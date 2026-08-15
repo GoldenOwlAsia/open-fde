@@ -27,6 +27,9 @@ export interface Engagement {
     };
     reliability?: { timeout?: string; retry?: string; fallback?: string };
     evaluation?: { required?: boolean };
+    checks?: {
+      overrides?: Array<{ id?: string; severity?: string; reason?: string }>;
+    };
   };
 }
 

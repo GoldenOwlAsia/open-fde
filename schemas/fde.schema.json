@@ -106,6 +106,25 @@
             "required": { "type": "boolean" }
           },
           "additionalProperties": true
+        },
+        "checks": {
+          "type": "object",
+          "properties": {
+            "overrides": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["id", "severity", "reason"],
+                "properties": {
+                  "id": { "type": "string", "minLength": 1 },
+                  "severity": { "enum": ["critical", "warning", "info"] },
+                  "reason": { "type": "string", "minLength": 1 }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": true

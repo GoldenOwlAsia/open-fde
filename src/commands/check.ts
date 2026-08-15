@@ -13,14 +13,28 @@ const SCORE_LABELS: Record<string, string> = {
   human_control: "Human Control"
 };
 
-export async function checkCommand(root: string): Promise<void> {
+export interface CheckCommandOptions {
+  only?: string;
+  skip?: string;
+}
+
+const parseIds = (value?: string) =>
+  value
+    ?.split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+export async function checkCommand(root: string, options: CheckCommandOptions = {}): Promise<void> {
   const ws = await ensureWorkspace(root);
   const invPath = path.join(ws, "environment", "inventory.json");
   if (!(await exists(invPath))) throw new Error("Run `fde scan` before `fde check`.");
 
   const inventory = await readJson<Inventory>(invPath);
   const engagement = await loadEngagement(root);
-  const result = runDefaultChecks(inventory, engagement);
+  const result = runDefaultChecks(inventory, engagement, {
+    only: parseIds(options.only),
+    skip: parseIds(options.skip)
+  });
   await writeJson(path.join(ws, "check-result.json"), result);
 
   console.log("OpenFDE Deployment Readiness\n");

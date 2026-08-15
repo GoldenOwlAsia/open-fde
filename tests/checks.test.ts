@@ -8,6 +8,7 @@ const emptyInventory: Inventory = { generatedAt: "", root: "/repo", components: 
 
 const fullEngagement: Engagement = {
   spec: {
+    successMetrics: [{ name: "resolution_rate", target: ">= 0.70" }],
     systems: [{ id: "error_monitoring", type: "sentry", access: "unknown" }],
     constraints: {
       pii: { allowExternalModel: false },
@@ -26,7 +27,8 @@ test("missing engagement produces the default findings", () => {
     "human-approval-undefined",
     "observability-not-detected",
     "pii-policy-undefined",
-    "reliability-policy-absent"
+    "reliability-policy-absent",
+    "success-metrics-undeclared"
   ]);
   assert.equal(result.findings.find((f) => f.id === "pii-policy-undefined")?.severity, "critical");
 });

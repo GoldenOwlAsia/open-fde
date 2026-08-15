@@ -17,10 +17,39 @@ export interface DetectedComponent {
   confidence: "low" | "medium" | "high";
 }
 
+export interface RegionSignal {
+  region: string;
+  /** file:line where the region literal appears */
+  evidence: string;
+}
+
+export interface SecretSignal {
+  file: string;
+  line: number;
+  /** What was matched (e.g. "AWS access key id"). Never the secret value itself. */
+  kind: string;
+}
+
+export interface WriteSignal {
+  /** Declared system type the signal maps to (e.g. postgres, s3, redis). */
+  systemType: string;
+  file: string;
+  line: number;
+  /** Named heuristic that matched (e.g. "SQL INSERT/UPDATE/DELETE"). */
+  pattern: string;
+}
+
+export interface ScanSignals {
+  regions: RegionSignal[];
+  secretSuspects: SecretSignal[];
+  writeSignals: WriteSignal[];
+}
+
 export interface Inventory {
   generatedAt: string;
   root: string;
   components: DetectedComponent[];
+  signals?: ScanSignals;
 }
 
 export interface GraphEdge {

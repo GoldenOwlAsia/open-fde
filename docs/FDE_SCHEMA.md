@@ -57,6 +57,25 @@ spec:
     required: true
 ```
 
+## Check severity overrides
+
+When the customer has explicitly accepted a risk, a check's severity can be
+overridden in `fde.yaml`. A `reason` is **required** — an override without one
+fails the run:
+
+```yaml
+spec:
+  checks:
+    overrides:
+      - id: observability-not-detected
+        severity: info
+        reason: Customer uses a homegrown metrics stack; accepted 2026-08-01
+```
+
+Overridden findings keep their evidence and gain a line recording the original
+severity and the reason. Unknown check ids are rejected with the list of
+available checks (`fde check --only`/`--skip` use the same ids).
+
 ## Validation
 
 `fde validate` checks `fde.yaml` against
