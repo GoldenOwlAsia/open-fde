@@ -117,9 +117,9 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 ### 1.5 Plugin contract (design only)
 
-- [ ] Write `docs/PLUGIN_CONTRACT.md`: manifest shape, capability declarations (files/network/exec/credentials), lifecycle
-- [ ] Refactor built-in scanners/checks to consume the same internal interfaces the contract will expose
-- [ ] No dynamic loader yet (explicit non-goal until v0.3+)
+- [x] Write `docs/PLUGIN_CONTRACT.md`: manifest shape, capability declarations (files/network/exec/credentials), lifecycle
+- [x] Refactor built-in scanners/checks to consume the same internal interfaces the contract will expose (`src/checks/registry.ts`, `src/scanners/contributions.ts`)
+- [x] No dynamic loader yet (explicit non-goal until v0.3+)
 
 **Exit criterion:** a team can add OpenFDE to CI, fail the build on critical findings, and see results in GitHub code scanning — still with zero network calls from OpenFDE itself.
 
