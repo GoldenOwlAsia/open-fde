@@ -7,6 +7,7 @@ import { mapCommand } from "./commands/map.js";
 import { checkCommand } from "./commands/check.js";
 import { reportCommand } from "./commands/report.js";
 import { validateCommand } from "./commands/validate.js";
+import { testCommand } from "./commands/test.js";
 import { VERSION } from "./version.js";
 
 const program = new Command();
@@ -30,6 +31,14 @@ program
   .description("Validate fde.yaml against the engagement schema")
   .argument("[root]")
   .action(async (root) => validateCommand(normalize(root)));
+program
+  .command("test")
+  .description("Run local, deterministic engagement tests")
+  .argument("[root]")
+  .option("--contracts", "run contract fixtures from .fde/contracts/")
+  .action(async (root, options) => {
+    await testCommand(normalize(root), options);
+  });
 program.command("report").argument("[root]").action(async (root) => reportCommand(normalize(root)));
 
 program.parseAsync().catch((error) => {

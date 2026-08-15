@@ -1,0 +1,14 @@
+system: customer_db
+description: Customer lookup used by the support agent
+cases:
+  - name: lookup by email
+    request:
+      operation: customers.lookup
+      params:
+        email: user@example.com
+    response:
+      example:
+        id: "123"
+        name: Ada
+        plan: pro
+      requiredFields: [id, name, plan]

@@ -144,8 +144,8 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 ### 2.3 Contract tests
 
-- [ ] Define agent contract-test format (declared integration ↔ expected request/response shape)
-- [ ] `fde test --contracts` runs local, deterministic contract fixtures (no live credentials)
+- [x] Define agent contract-test format (declared integration ↔ expected request/response shape) — `docs/CONTRACT_TESTS.md`, fixtures in `.fde/contracts/`
+- [x] `fde test --contracts` runs local, deterministic contract fixtures (no live credentials)
 
 ### 2.4 Agent context export + MCP
 
