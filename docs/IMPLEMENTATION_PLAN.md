@@ -161,12 +161,12 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 > Goal: close the loop after deployment — import what actually happened and attach it to the engagement as evidence.
 
-- [ ] OpenTelemetry trace import (file-based OTLP JSON first; no live collectors required)
-- [ ] Evidence packs: `fde evidence add <file>` with automatic secret/token redaction, stored under `.fde/evidence/`
-- [ ] Incident import: normalize a minimal incident record (`.fde/incidents/`), link to graph nodes
-- [ ] Deterministic replay primitives: re-run a recorded trace against contract fixtures (no production calls)
-- [ ] `fde status`: deployment health summary from imported evidence (declared vs observed)
-- [ ] Redaction rules test suite (never persist raw credentials — verify with fixtures containing planted fake secrets)
+- [x] OpenTelemetry trace import (file-based OTLP JSON first; no live collectors required) — `fde import trace`, normalized + redacted into `.fde/traces/`
+- [x] Evidence packs: `fde evidence add <file>` with automatic secret/token redaction, stored under `.fde/evidence/` (text only; binary refused)
+- [x] Incident import: normalize a minimal incident record (`.fde/incidents/`), link to graph nodes — referenced systems marked declared/undeclared
+- [x] Deterministic replay primitives: re-run a recorded trace against contract fixtures (no production calls) — `fde replay <trace>`: verified / shape-mismatch / not-exercised per case
+- [x] `fde status`: deployment health summary from imported evidence (declared vs observed)
+- [x] Redaction rules test suite (never persist raw credentials — verify with fixtures containing planted fake secrets) — `tests/redact.test.ts` + persistence assertions in evidence/trace/incident tests
 
 **Exit criterion:** an FDE can attach real production evidence (traces, incidents) to the workspace and show a customer "declared vs observed" without OpenFDE ever contacting production itself.
 
@@ -214,7 +214,7 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 - [x] No telemetry, no network calls, local-first (verified: zero network code in `src/`)
 - [ ] Threat-model doc for the plugin loader before it ships
-- [ ] Redaction utilities shared by evidence/handoff/extract features
+- [x] Redaction utilities shared by evidence/handoff/extract features (`src/core/redact.ts`, used by evidence + trace/incident import)
 
 ### Docs & community
 

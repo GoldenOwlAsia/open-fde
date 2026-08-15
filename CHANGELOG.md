@@ -50,6 +50,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `fde mcp`: opt-in, local, read-only MCP server (stdio) exposing
   `get_engagement`, `get_environment`, `get_integrations`,
   `get_constraints`, `run_preflight`.
+- Production evidence (v0.4 scope): shared redaction utilities
+  (`src/core/redact.ts`), `fde evidence add` (redacted evidence packs),
+  `fde import trace` (file-based OTLP JSON → normalized spans),
+  `fde import incident` (normalized records linked to declared systems),
+  `fde replay <trace>` (recorded trace vs contract fixtures, no production
+  calls), and `fde status` (declared vs observed summary).
 
 ### Fixed
 

@@ -10,6 +10,10 @@ import { validateCommand } from "./commands/validate.js";
 import { testCommand } from "./commands/test.js";
 import { exportCommand } from "./commands/export.js";
 import { mcpCommand } from "./commands/mcp.js";
+import { evidenceAddCommand } from "./commands/evidence.js";
+import { importIncidentCommand, importTraceCommand } from "./commands/importCmd.js";
+import { replayCommand } from "./commands/replay.js";
+import { statusCommand } from "./commands/status.js";
 import { VERSION } from "./version.js";
 
 const program = new Command();
@@ -52,6 +56,50 @@ program
   .description("Serve the engagement over MCP (stdio, read-only, opt-in)")
   .argument("[root]")
   .action(async (root) => mcpCommand(normalize(root)));
+
+const evidence = program.command("evidence").description("Manage redacted evidence packs");
+evidence
+  .command("add")
+  .description("Add a text file to .fde/evidence/ with automatic redaction")
+  .argument("<file>", "file to add")
+  .argument("[root]")
+  .action(async (file, root) => {
+    await evidenceAddCommand(normalize(root), file);
+  });
+
+const importCmd = program.command("import").description("Import external records into the workspace");
+importCmd
+  .command("trace")
+  .description("Import a file-based OTLP JSON trace export into .fde/traces/")
+  .argument("<file>", "OTLP JSON export")
+  .argument("[root]")
+  .action(async (file, root) => {
+    await importTraceCommand(normalize(root), file);
+  });
+importCmd
+  .command("incident")
+  .description("Import and normalize an incident record into .fde/incidents/")
+  .argument("<file>", "incident YAML/JSON")
+  .argument("[root]")
+  .action(async (file, root) => {
+    await importIncidentCommand(normalize(root), file);
+  });
+
+program
+  .command("replay")
+  .description("Re-run an imported trace against the contract fixtures (no production calls)")
+  .argument("<trace>", "trace name in .fde/traces/")
+  .argument("[root]")
+  .action(async (trace, root) => {
+    await replayCommand(normalize(root), trace);
+  });
+program
+  .command("status")
+  .description("Deployment health summary from imported evidence (declared vs observed)")
+  .argument("[root]")
+  .action(async (root) => {
+    await statusCommand(normalize(root));
+  });
 program.command("report").argument("[root]").action(async (root) => reportCommand(normalize(root)));
 
 program.parseAsync().catch((error) => {
