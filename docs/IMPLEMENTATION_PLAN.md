@@ -109,11 +109,11 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 ### 1.4 CI integration
 
-- [ ] `fde check --format json` (stable machine-readable output)
-- [ ] `fde check --format sarif` (GitHub code scanning upload)
-- [ ] Exit code policy: `--fail-on critical|warning|never` (default `critical`)
-- [ ] Reusable GitHub Action (`openfde/action` or `action.yml` in this repo) that runs scan + check and comments/uploads SARIF
-- [ ] Docs: "OpenFDE in CI" guide
+- [x] `fde check --format json` (stable machine-readable output)
+- [x] `fde check --format sarif` (GitHub code scanning upload)
+- [x] Exit code policy: `--fail-on critical|warning|never` (default `critical`)
+- [ ] Reusable GitHub Action (`openfde/action` or `action.yml` in this repo) that runs scan + check and comments/uploads SARIF — `action.yml` implemented (composite: build → scan → check → SARIF upload → enforce exit code); still needs one live GitHub run to verify before checking off
+- [x] Docs: "OpenFDE in CI" guide (`docs/CI.md`)
 
 ### 1.5 Plugin contract (design only)
 

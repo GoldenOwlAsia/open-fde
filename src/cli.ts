@@ -7,9 +7,10 @@ import { mapCommand } from "./commands/map.js";
 import { checkCommand } from "./commands/check.js";
 import { reportCommand } from "./commands/report.js";
 import { validateCommand } from "./commands/validate.js";
+import { VERSION } from "./version.js";
 
 const program = new Command();
-program.name("fde").description("OpenFDE delivery harness").version("0.1.0");
+program.name("fde").description("OpenFDE delivery harness").version(VERSION);
 
 const normalize = (root?: string) => path.resolve(root ?? process.cwd());
 
@@ -21,6 +22,8 @@ program
   .argument("[root]")
   .option("--only <ids>", "run only these comma-separated check ids")
   .option("--skip <ids>", "skip these comma-separated check ids")
+  .option("--format <format>", "output format: text, json, or sarif", "text")
+  .option("--fail-on <level>", "exit 1 when findings reach this severity: critical, warning, or never", "critical")
   .action(async (root, options) => checkCommand(normalize(root), options));
 program
   .command("validate")

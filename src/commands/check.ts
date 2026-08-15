@@ -1,8 +1,10 @@
 import path from "node:path";
 import { ensureWorkspace, exists, readJson, writeJson } from "../core/workspace.js";
-import type { Inventory, Severity } from "../core/types.js";
+import type { CheckResult, Finding, Inventory, Severity } from "../core/types.js";
 import { loadEngagement } from "../core/engagement.js";
-import { runDefaultChecks } from "../checks/defaultChecks.js";
+import { builtinChecks, runDefaultChecks } from "../checks/defaultChecks.js";
+import { toSarif } from "../report/sarif.js";
+import { VERSION } from "../version.js";
 
 const SCORE_LABELS: Record<string, string> = {
   security: "Security",
@@ -13,9 +15,14 @@ const SCORE_LABELS: Record<string, string> = {
   human_control: "Human Control"
 };
 
+export type CheckFormat = "text" | "json" | "sarif";
+export type FailOn = "critical" | "warning" | "never";
+
 export interface CheckCommandOptions {
   only?: string;
   skip?: string;
+  format?: string;
+  failOn?: string;
 }
 
 const parseIds = (value?: string) =>
@@ -24,7 +31,23 @@ const parseIds = (value?: string) =>
     .map((s) => s.trim())
     .filter(Boolean);
 
+function parseChoice<T extends string>(value: string | undefined, name: string, choices: T[], fallback: T): T {
+  if (value === undefined) return fallback;
+  if ((choices as string[]).includes(value)) return value as T;
+  throw new Error(`Invalid ${name} "${value}" (use ${choices.join(", ")}).`);
+}
+
+/** True when the findings should fail the run under the given --fail-on policy. */
+export function shouldFail(findings: Finding[], failOn: FailOn): boolean {
+  if (failOn === "never") return false;
+  const failing: Severity[] = failOn === "critical" ? ["critical"] : ["critical", "warning"];
+  return findings.some((f) => failing.includes(f.severity));
+}
+
 export async function checkCommand(root: string, options: CheckCommandOptions = {}): Promise<void> {
+  const format = parseChoice<CheckFormat>(options.format, "--format", ["text", "json", "sarif"], "text");
+  const failOn = parseChoice<FailOn>(options.failOn, "--fail-on", ["critical", "warning", "never"], "critical");
+
   const ws = await ensureWorkspace(root);
   const invPath = path.join(ws, "environment", "inventory.json");
   if (!(await exists(invPath))) throw new Error("Run `fde scan` before `fde check`.");
@@ -37,6 +60,18 @@ export async function checkCommand(root: string, options: CheckCommandOptions = 
   });
   await writeJson(path.join(ws, "check-result.json"), result);
 
+  if (format === "json") {
+    console.log(JSON.stringify(result, null, 2));
+  } else if (format === "sarif") {
+    console.log(JSON.stringify(toSarif(result, builtinChecks, VERSION), null, 2));
+  } else {
+    renderText(result);
+  }
+
+  if (shouldFail(result.findings, failOn)) process.exitCode = 1;
+}
+
+function renderText(result: CheckResult): void {
   console.log("OpenFDE Deployment Readiness\n");
   for (const [key, value] of Object.entries(result.scores)) {
     console.log(`${(SCORE_LABELS[key] ?? key).padEnd(15)}${value}`);

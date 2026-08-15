@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `fde validate` — validates `fde.yaml` against the engagement schema with
+  `fde.yaml:line:col` error positions; the same validation now runs inside
+  `map`/`check`/`report`. Unknown fields warn instead of failing.
+- Internal check registry (`{ id, category, appliesTo, run(context) }`) — the
+  interface the future plugin contract will expose.
+- `fde check --only <ids>` / `--skip <ids>` to select checks.
+- Severity overrides in `fde.yaml` (`spec.checks.overrides`) with a required
+  `reason`, recorded as evidence on the overridden finding.
+- New checks: `data-residency-violation` (regions in Terraform/K8s config vs
+  `allowedRegions`), `secrets-committed` (`.env` files and credential-looking
+  patterns — file + line only, values never persisted),
+  `write-boundary-violation` (write-implying code signals against declared
+  `read_only` systems), `success-metrics-undeclared`.
+- Scanner signals in `inventory.json`: detected regions, secret suspects, and
+  write signals, each with `file:line` evidence.
+- CI integration: `fde check --format json|sarif` and
+  `--fail-on critical|warning|never` (default `critical`), a reusable
+  composite GitHub Action (`action.yml`), and an "OpenFDE in CI" guide
+  (`docs/CI.md`).
+
 ## [0.1.0] - 2026-08-15
 
 First public release: the V0.1 "Environment Doctor" MVP.

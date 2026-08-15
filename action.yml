@@ -1,0 +1,66 @@
+name: "OpenFDE Preflight"
+description: >-
+  Run the OpenFDE deployment preflight (scan + check) against a repository.
+  Local-first: nothing leaves the runner except the optional SARIF upload to
+  GitHub code scanning.
+branding:
+  icon: "check-circle"
+  color: "blue"
+
+inputs:
+  path:
+    description: "Directory to scan (relative to the workspace)."
+    required: false
+    default: "."
+  fail-on:
+    description: "Fail the job when findings reach this severity: critical, warning, or never."
+    required: false
+    default: "critical"
+  upload-sarif:
+    description: "Upload results to GitHub code scanning (requires security-events: write)."
+    required: false
+    default: "true"
+  sarif-file:
+    description: "Where to write the SARIF output."
+    required: false
+    default: "openfde.sarif"
+
+outputs:
+  sarif-file:
+    description: "Path of the generated SARIF file."
+    value: ${{ inputs.sarif-file }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build OpenFDE
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: |
+        npm install --no-audit --no-fund
+        npm run build
+
+    - name: Scan repository
+      shell: bash
+      run: node "${{ github.action_path }}/dist/cli.js" scan "${{ inputs.path }}"
+
+    - name: Run preflight checks
+      id: check
+      shell: bash
+      # Always produce the SARIF file, then propagate the check's exit code
+      # after the upload step has had a chance to run.
+      run: |
+        set +e
+        node "${{ github.action_path }}/dist/cli.js" check "${{ inputs.path }}" \
+          --format sarif --fail-on "${{ inputs.fail-on }}" > "${{ inputs.sarif-file }}"
+        echo "exit-code=$?" >> "$GITHUB_OUTPUT"
+
+    - name: Upload SARIF to code scanning
+      if: ${{ inputs.upload-sarif == 'true' }}
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ inputs.sarif-file }}
+
+    - name: Enforce fail-on policy
+      shell: bash
+      run: exit "${{ steps.check.outputs.exit-code }}"
