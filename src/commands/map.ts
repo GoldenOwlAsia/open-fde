@@ -1,34 +1,86 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { ensureWorkspace, exists, readJson, writeJson } from "../core/workspace.js";
-import type { IntegrationGraph, Inventory } from "../core/types.js";
+import type { ComponentCategory, GraphEdge, IntegrationGraph, Inventory } from "../core/types.js";
+import { loadEngagement } from "../core/engagement.js";
+
+const INTEGRATION_CATEGORIES = new Set<ComponentCategory>(["data", "cloud", "ai", "observability", "auth"]);
+
+const SYSTEM_TYPE_CATEGORIES: Record<string, ComponentCategory> = {
+  postgres: "data",
+  mysql: "data",
+  redis: "data",
+  s3: "data",
+  aws: "cloud",
+  azure: "cloud",
+  gcp: "cloud",
+  openai: "ai",
+  anthropic: "ai",
+  bedrock: "ai",
+  vertex: "ai",
+  sentry: "observability",
+  opentelemetry: "observability",
+  datadog: "observability",
+  okta: "auth",
+  auth0: "auth"
+};
+
+const normalizeAccess = (access?: string): GraphEdge["access"] =>
+  access === "read_only" || access === "read_write" ? access : "unknown";
+
+const mermaidId = (id: string) => id.replace(/[^a-zA-Z0-9_]/g, "_");
 
 export async function mapCommand(root: string): Promise<void> {
   const ws = await ensureWorkspace(root);
   const invPath = path.join(ws, "environment", "inventory.json");
   if (!(await exists(invPath))) throw new Error("Run `fde scan` before `fde map`.");
   const inventory = await readJson<Inventory>(invPath);
+  const engagement = await loadEngagement(root);
 
-  const graph: IntegrationGraph = {
-    generatedAt: new Date().toISOString(),
-    nodes: inventory.components.map((c) => ({ id: c.id, label: c.name, category: c.category })),
-    edges: []
-  };
+  const appId = "app";
+  const appLabel = engagement?.metadata?.name ?? path.basename(root);
+  const nodes: IntegrationGraph["nodes"] = [
+    { id: appId, label: appLabel, category: "other" },
+    ...inventory.components.map((c) => ({ id: c.id, label: c.name, category: c.category }))
+  ];
 
-  const fdePath = path.join(root, "fde.yaml");
-  if (await exists(fdePath)) {
-    const text = await readFile(fdePath, "utf8");
-    if (/openai|anthropic|bedrock|vertex/i.test(text) && /postgres/i.test(text)) {
-      graph.edges.push({ from: "ai-workflow", to: "postgres", relationship: "queries", access: "unknown" });
-    }
+  // Declared access from fde.yaml, keyed by system type, applied to matching detected components.
+  const declaredAccess = new Map<string, GraphEdge["access"]>();
+  const systems = engagement?.spec?.systems ?? [];
+  for (const system of systems) {
+    if (system.type) declaredAccess.set(system.type.toLowerCase(), normalizeAccess(system.access));
   }
 
-  const graphPath = path.join(ws, "environment", "integration-graph.json");
-  await writeJson(graphPath, graph);
+  const edges: GraphEdge[] = inventory.components
+    .filter((c) => INTEGRATION_CATEGORIES.has(c.category))
+    .map((c) => ({
+      from: appId,
+      to: c.id,
+      relationship: "uses",
+      access: declaredAccess.get(c.id) ?? "unknown"
+    }));
 
-  const lines = ["flowchart LR", ...graph.nodes.map((n) => `  ${n.id.replace(/[^a-zA-Z0-9_]/g, "_")}[\"${n.label}\"]`)];
-  for (const e of graph.edges) lines.push(`  ${e.from.replace(/[^a-zA-Z0-9_]/g, "_")} -->|${e.relationship}| ${e.to.replace(/[^a-zA-Z0-9_]/g, "_")}`);
+  // Declared systems with no detected counterpart still belong on the map.
+  for (const system of systems) {
+    const type = system.type?.toLowerCase();
+    if (!type || nodes.some((n) => n.id === type)) continue;
+    const id = system.id ?? type;
+    if (nodes.some((n) => n.id === id)) continue;
+    nodes.push({ id, label: `${system.id ?? type} (declared)`, category: SYSTEM_TYPE_CATEGORIES[type] ?? "other" });
+    edges.push({ from: appId, to: id, relationship: "declared", access: normalizeAccess(system.access) });
+  }
+
+  const graph: IntegrationGraph = { generatedAt: new Date().toISOString(), nodes, edges };
+  await writeJson(path.join(ws, "environment", "integration-graph.json"), graph);
+
+  const lines = ["flowchart LR", ...graph.nodes.map((n) => `  ${mermaidId(n.id)}["${n.label}"]`)];
+  for (const e of graph.edges) {
+    const label = e.access && e.access !== "unknown" ? `${e.relationship} (${e.access})` : e.relationship;
+    lines.push(`  ${mermaidId(e.from)} -->|${label}| ${mermaidId(e.to)}`);
+  }
   await writeFile(path.join(ws, "environment", "integration-graph.mmd"), `${lines.join("\n")}\n`, "utf8");
 
   console.log(`Generated integration map with ${graph.nodes.length} nodes and ${graph.edges.length} edges.`);
+  console.log(`  ${path.join(ws, "environment", "integration-graph.json")}`);
+  console.log(`  ${path.join(ws, "environment", "integration-graph.mmd")}`);
 }

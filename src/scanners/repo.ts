@@ -4,7 +4,7 @@ import type { DetectedComponent, Inventory } from "../core/types.js";
 
 async function walk(root: string, maxFiles = 1500): Promise<string[]> {
   const results: string[] = [];
-  const ignored = new Set(["node_modules", ".git", "dist", "build", ".next", ".venv", "venv"]);
+  const ignored = new Set(["node_modules", ".git", ".fde", "dist", "build", ".next", ".venv", "venv"]);
 
   async function visit(dir: string): Promise<void> {
     if (results.length >= maxFiles) return;
@@ -30,6 +30,27 @@ function component(
   return { id, name, category, evidence, confidence: evidence.length > 1 ? "high" : "medium" };
 }
 
+interface Signature {
+  id: string;
+  name: string;
+  category: DetectedComponent["category"];
+  pattern: RegExp;
+}
+
+const signatures: Signature[] = [
+  { id: "postgres", name: "PostgreSQL", category: "data", pattern: /postgres|pgvector|\bpg\b/i },
+  { id: "redis", name: "Redis", category: "data", pattern: /\bredis\b/i },
+  { id: "aws", name: "AWS", category: "cloud", pattern: /aws-sdk|@aws-sdk|boto3|provider\s+"aws"|aws_/i },
+  { id: "openai", name: "OpenAI", category: "ai", pattern: /openai/i },
+  { id: "anthropic", name: "Anthropic", category: "ai", pattern: /anthropic/i },
+  { id: "sentry", name: "Sentry", category: "observability", pattern: /sentry/i },
+  { id: "opentelemetry", name: "OpenTelemetry", category: "observability", pattern: /opentelemetry|open-telemetry|\botel\b/i },
+  { id: "okta", name: "Okta", category: "auth", pattern: /\bokta\b/i },
+  { id: "auth0", name: "Auth0", category: "auth", pattern: /auth0/i }
+];
+
+const MAX_EVIDENCE_FILES = 5;
+
 export async function scanRepository(root: string): Promise<Inventory> {
   const files = await walk(root);
   const rel = files.map((f) => path.relative(root, f));
@@ -52,34 +73,38 @@ export async function scanRepository(root: string): Promise<Inventory> {
   const k8sFiles = has((f) => /(k8s|kubernetes|helm)/i.test(f) && /\.ya?ml$/.test(f));
   if (k8sFiles.length) components.push(component("kubernetes", "Kubernetes", "infrastructure", k8sFiles.slice(0, 20)));
 
-  const ghActions = has((f) => f.startsWith(".github/workflows/") && /\.ya?ml$/.test(f));
+  const ghActions = has((f) => f.startsWith(path.join(".github", "workflows") + path.sep) && /\.ya?ml$/.test(f));
   if (ghActions.length) components.push(component("github-actions", "GitHub Actions", "cicd", ghActions));
 
-  const textCandidates = rel.filter((f) => /(package\.json|pyproject\.toml|requirements\.txt|\.tf$|\.ya?ml$|\.ts$|\.js$|\.py$)/.test(f)).slice(0, 250);
-  let corpus = "";
+  // Signature scan: read a bounded set of text files and record which files matched,
+  // so every detection carries file-level evidence. fde.yaml is excluded — declared
+  // systems are engagement input, not repository discovery.
+  const textCandidates = rel
+    .filter((f) => /(package\.json|pyproject\.toml|requirements\.txt|\.tf$|\.ya?ml$|\.ts$|\.js$|\.py$)/.test(f))
+    .filter((f) => f !== "fde.yaml" && !f.endsWith(`${path.sep}fde.yaml`))
+    .slice(0, 250);
+
+  const matches = new Map<string, string[]>();
   for (const file of textCandidates) {
+    let content: string;
     try {
-      const content = await readFile(path.join(root, file), "utf8");
-      corpus += `\n${content.slice(0, 20000)}`;
+      content = (await readFile(path.join(root, file), "utf8")).slice(0, 20000);
     } catch {
-      // Ignore unreadable files.
+      continue;
+    }
+    for (const sig of signatures) {
+      if (!sig.pattern.test(content)) continue;
+      const found = matches.get(sig.id) ?? [];
+      if (found.length < MAX_EVIDENCE_FILES) found.push(file);
+      matches.set(sig.id, found);
     }
   }
 
-  const signatures: Array<[RegExp, DetectedComponent]> = [
-    [/postgres|pgvector|\bpg\b/i, component("postgres", "PostgreSQL", "data", ["source/package reference"])],
-    [/redis/i, component("redis", "Redis", "data", ["source/package reference"])],
-    [/aws-sdk|@aws-sdk|provider\s+"aws"|aws_/i, component("aws", "AWS", "cloud", ["source/infrastructure reference"])],
-    [/openai/i, component("openai", "OpenAI", "ai", ["source/package reference"])],
-    [/anthropic/i, component("anthropic", "Anthropic", "ai", ["source/package reference"])],
-    [/sentry/i, component("sentry", "Sentry", "observability", ["source/package reference"])],
-    [/opentelemetry|open-telemetry|otel/i, component("opentelemetry", "OpenTelemetry", "observability", ["source/package reference"])],
-    [/okta/i, component("okta", "Okta", "auth", ["source/package reference"])],
-    [/auth0/i, component("auth0", "Auth0", "auth", ["source/package reference"])]
-  ];
-
-  for (const [regex, detected] of signatures) {
-    if (regex.test(corpus) && !components.some((c) => c.id === detected.id)) components.push(detected);
+  for (const sig of signatures) {
+    const evidence = matches.get(sig.id);
+    if (evidence && !components.some((c) => c.id === sig.id)) {
+      components.push(component(sig.id, sig.name, sig.category, evidence));
+    }
   }
 
   return {

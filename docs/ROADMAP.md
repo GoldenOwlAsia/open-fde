@@ -1,5 +1,7 @@
 # OpenFDE Roadmap
 
+> Detailed, checkable work items for each version live in [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md).
+
 ## v0.1 — Environment Doctor
 
 ```text
