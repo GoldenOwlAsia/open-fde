@@ -1,0 +1,44 @@
+apiVersion: openfde.dev/v1alpha1
+kind: Engagement
+metadata:
+  name: support-agent
+
+spec:
+  customer:
+    name: example-saas
+
+  objective:
+    summary: Automate first-line support ticket resolution with an LLM agent
+
+  successMetrics:
+    - name: resolution_rate
+      target: ">= 0.70"
+
+  environment:
+    cloud: aws
+    regions: [ap-southeast-1]
+
+  systems:
+    # Declared read-only — but src/agent.ts contains an INSERT. `fde check`
+    # flags the write-boundary violation with the exact file and line.
+    - id: customer_db
+      type: postgres
+      access: read_only
+
+  constraints:
+    dataResidency:
+      allowedRegions: [ap-southeast-1]
+    pii:
+      allowExternalModel: true
+    humanApproval:
+      # Declared but empty: the agent has side-effecting ambitions and nobody
+      # has decided what needs a human. `fde check` warns about this too.
+      requiredFor: []
+
+  reliability:
+    timeout: 30s
+    retry: exponential-backoff
+    fallback: human-escalation
+
+  evaluation:
+    required: true

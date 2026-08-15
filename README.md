@@ -76,6 +76,10 @@ fde check
 fde report
 ```
 
+Runnable examples live in [`examples/`](examples/): a customer-support app, a
+Python ML pipeline, a Kubernetes/Terraform deployment with a residency
+violation, and an LLM agent whose tools cross a declared write boundary.
+
 Expected output:
 
 ```text
@@ -339,6 +343,28 @@ Initial check groups:
 Checks should always explain **why** something was flagged and which evidence produced the result.
 
 OpenFDE should prefer explainable checks over opaque AI scores.
+
+For CI use, `fde check` supports machine-readable output and an exit-code policy:
+
+```bash
+fde check --format json|sarif      # stable JSON, or SARIF for GitHub code scanning
+fde check --fail-on critical       # critical (default) | warning | never
+fde check --only <ids> / --skip <ids>
+```
+
+See [`docs/CI.md`](docs/CI.md) and the reusable GitHub Action ([`action.yml`](action.yml)).
+
+---
+
+## `fde validate`
+
+Validates `fde.yaml` against the engagement schema with `fde.yaml:line:col`
+error positions. Unknown fields warn; schema violations fail with exit code 1.
+The same validation runs automatically inside `map`, `check`, and `report`.
+
+```bash
+fde validate
+```
 
 ---
 

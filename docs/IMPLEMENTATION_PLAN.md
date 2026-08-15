@@ -206,8 +206,8 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 ### Testing & quality
 
 - [x] Unit + e2e test baseline (`pnpm test`, node:test + tsx)
-- [ ] Fixture repositories per scanner family (false-positive regression suite)
-- [ ] Golden-file tests for report/Mermaid/JSON outputs
+- [x] Fixture repositories per scanner family (false-positive regression suite) — `tests/fixtures.test.ts`; already caught and fixed one real FP (`aws_` matching `flaws_found`)
+- [x] Golden-file tests for report/Mermaid/JSON outputs — `tests/golden.test.ts` + `tests/golden/`, regenerate with `UPDATE_GOLDEN=1`
 - [ ] Windows path handling audit (walker and evidence paths currently assume POSIX-style separators in places)
 
 ### Security (see `SECURITY.md`)
@@ -219,9 +219,9 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 ### Docs & community
 
 - [x] Design docs (architecture, schema, plugin model, roadmap, MVP plan)
-- [ ] Per-command reference docs (`docs/commands/`)
-- [ ] "Writing a scanner" contributor tutorial
-- [ ] Example gallery: at least 3 example repos beyond `customer-support` (python-ml, k8s-heavy, agent-with-tools)
+- [x] Per-command reference docs (`docs/commands/`) — init, scan, map, check, report, validate
+- [x] "Writing a scanner" contributor tutorial (`docs/WRITING_A_SCANNER.md`)
+- [x] Example gallery: at least 3 example repos beyond `customer-support` (python-ml, k8s-heavy, agent-with-tools) — each verified to produce the findings its README documents
 
 ---
 

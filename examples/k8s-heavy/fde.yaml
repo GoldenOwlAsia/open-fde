@@ -1,0 +1,42 @@
+apiVersion: openfde.dev/v1alpha1
+kind: Engagement
+metadata:
+  name: order-platform-eu
+
+spec:
+  customer:
+    name: example-logistics
+
+  objective:
+    summary: Run the order platform inside the EU data boundary
+
+  successMetrics:
+    - name: p99_latency
+      target: "< 300ms"
+
+  environment:
+    cloud: aws
+    regions: [eu-central-1]
+
+  systems:
+    - id: orders_db
+      type: postgres
+      access: read_write
+
+  constraints:
+    # The customer's contract requires EU residency — but main.tf provisions
+    # us-east-1. `fde check` flags this as a critical residency violation.
+    dataResidency:
+      allowedRegions: [eu-central-1]
+    pii:
+      allowExternalModel: false
+    humanApproval:
+      requiredFor: [schema.migrate]
+
+  reliability:
+    timeout: 30s
+    retry: exponential-backoff
+    fallback: queue-and-retry
+
+  evaluation:
+    required: true

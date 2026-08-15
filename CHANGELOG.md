@@ -28,6 +28,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--fail-on critical|warning|never` (default `critical`), a reusable
   composite GitHub Action (`action.yml`), and an "OpenFDE in CI" guide
   (`docs/CI.md`).
+- Plugin contract design doc (`docs/PLUGIN_CONTRACT.md`); built-in scanners
+  refactored into the contribution interfaces the contract will expose.
+- Docs: per-command references (`docs/commands/`), a "Writing a scanner"
+  tutorial, and three new runnable examples (`python-ml`, `k8s-heavy`,
+  `agent-with-tools`).
+- Tests: golden-file suite for all generated artifacts and a per-family
+  scanner false-positive regression suite.
+
+### Fixed
+
+- The AWS content signature matched inside words (e.g. `flaws_found`).
 
 ## [0.1.0] - 2026-08-15
 

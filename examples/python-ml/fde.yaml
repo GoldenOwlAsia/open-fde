@@ -1,0 +1,46 @@
+apiVersion: openfde.dev/v1alpha1
+kind: Engagement
+metadata:
+  name: churn-ml-pipeline
+
+spec:
+  customer:
+    name: example-retailer
+
+  objective:
+    summary: Ship a churn-prediction pipeline with LLM-assisted feature summaries
+
+  successMetrics:
+    - name: auc
+      target: ">= 0.85"
+
+  environment:
+    cloud: aws
+    regions: [us-east-1]
+
+  systems:
+    - id: feature_store
+      type: s3
+      access: read_only
+    - id: llm
+      type: openai
+      access: read_only
+    - id: error_monitoring
+      type: sentry
+      access: read_write
+
+  constraints:
+    dataResidency:
+      allowedRegions: [us-east-1]
+    pii:
+      allowExternalModel: false
+    humanApproval:
+      requiredFor: [model.deploy]
+
+  reliability:
+    timeout: 60s
+    retry: exponential-backoff
+    fallback: skip-llm-summary
+
+  # evaluation is intentionally NOT declared — run `fde check` to see the
+  # evaluation-not-declared warning this produces.
