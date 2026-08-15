@@ -1,0 +1,28 @@
+{
+  "name": "openfde",
+  "version": "0.1.0-alpha.0",
+  "description": "Local-first environment discovery and deployment preflight for Forward Deployed Engineers.",
+  "type": "module",
+  "bin": {
+    "fde": "dist/cli.js"
+  },
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/cli.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "yaml": "^2.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "license": "Apache-2.0"
+}

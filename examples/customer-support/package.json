@@ -1,0 +1,9 @@
+{
+  "name": "customer-support-example",
+  "private": true,
+  "dependencies": {
+    "@sentry/node": "latest",
+    "@opentelemetry/api": "latest",
+    "pg": "latest"
+  }
+}

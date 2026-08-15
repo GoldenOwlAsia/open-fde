@@ -1,0 +1,52 @@
+apiVersion: openfde.dev/v1alpha1
+kind: Engagement
+metadata:
+  name: acme-ai-support
+
+spec:
+  customer:
+    name: acme
+
+  objective:
+    summary: Automate first-line support triage while keeping customer PII inside Singapore
+
+  successMetrics:
+    - name: triage_accuracy
+      target: ">= 0.90"
+    - name: p95_response_time
+      target: "< 20s"
+
+  environment:
+    cloud: aws
+    regions:
+      - ap-southeast-1
+
+  systems:
+    - id: primary_db
+      type: postgres
+      access: read_only
+    - id: ai_provider
+      type: bedrock
+      access: unknown
+    - id: error_monitoring
+      type: sentry
+      access: unknown
+
+  constraints:
+    dataResidency:
+      allowedRegions:
+        - ap-southeast-1
+    pii:
+      allowExternalModel: false
+    humanApproval:
+      requiredFor:
+        - refund.execute
+        - customer.delete
+
+  reliability:
+    timeout: 30s
+    retry: exponential-backoff
+    fallback: human-escalation
+
+  evaluation:
+    required: true
