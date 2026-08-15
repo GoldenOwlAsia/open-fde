@@ -72,7 +72,7 @@ test("scanRepository extracts region, secret, and write signals with file:line e
 
     const kinds = signals.secretSuspects.map((s) => `${s.file}: ${s.kind}`);
     assert.ok(kinds.includes(".env: dotenv file in the repository (verify it is not committed)"));
-    assert.ok(kinds.includes(`${path.join("src", "db.ts")}: AWS access key id`));
+    assert.ok(kinds.includes("src/db.ts: AWS access key id"));
     // .env.example is a template, not a committed secret.
     assert.ok(!kinds.some((k) => k.startsWith(".env.example")));
     // Secret values must never be persisted in the inventory.
@@ -80,7 +80,7 @@ test("scanRepository extracts region, secret, and write signals with file:line e
 
     const writes = signals.writeSignals.filter((w) => w.systemType === "postgres");
     assert.deepEqual(writes, [
-      { systemType: "postgres", file: path.join("src", "db.ts"), line: 1, pattern: "SQL INSERT/UPDATE/DELETE" }
+      { systemType: "postgres", file: "src/db.ts", line: 1, pattern: "SQL INSERT/UPDATE/DELETE" }
     ]);
   } finally {
     await rm(root, { recursive: true, force: true });

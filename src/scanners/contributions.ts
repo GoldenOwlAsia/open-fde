@@ -1,9 +1,9 @@
-import path from "node:path";
 import type { DetectedComponent } from "../core/types.js";
 
 // Internal scanner contribution interfaces. These are the shapes the future
 // plugin contract will expose (see docs/PLUGIN_CONTRACT.md) — built-in
 // detectors are just contributions that ship with the CLI.
+// Paths passed to matchers are always POSIX-normalized ("/" separators).
 
 /** Detects a component from file path shape alone (no content read). */
 export interface FileSignature {
@@ -60,7 +60,7 @@ export const builtinFileSignatures: FileSignature[] = [
     id: "github-actions",
     name: "GitHub Actions",
     category: "cicd",
-    matches: (f) => f.startsWith(path.join(".github", "workflows") + path.sep) && /\.ya?ml$/.test(f)
+    matches: (f) => f.startsWith(".github/workflows/") && /\.ya?ml$/.test(f)
   }
 ];
 

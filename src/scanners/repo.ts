@@ -59,14 +59,16 @@ const WRITE_PATTERNS: Record<string, Array<{ pattern: string; re: RegExp }>> = {
   redis: [{ pattern: "Redis write command", re: /\.(hset|lpush|rpush|sadd|zadd|flushall|flushdb)\s*\(/i }]
 };
 
-const isEnvFile = (f: string) => /(^|\/)\.env(\.[^/]+)?$/.test(f.replaceAll(path.sep, "/"));
+const isEnvFile = (f: string) => /(^|\/)\.env(\.[^/]+)?$/.test(f);
 const isEnvExample = (f: string) => /\.(example|sample|template)$/.test(f);
 const isCodeFile = (f: string) => /\.(ts|js|py|sql)$/.test(f);
 const isInfraFile = (f: string) => f.endsWith(".tf") || /\.ya?ml$/.test(f);
 
 export async function scanRepository(root: string): Promise<Inventory> {
   const files = await walk(root);
-  const rel = files.map((f) => path.relative(root, f));
+  // Repo-relative paths are normalized to POSIX form so matchers, evidence
+  // strings, and generated artifacts are identical on every OS.
+  const rel = files.map((f) => path.relative(root, f).split(path.sep).join("/"));
   const components: DetectedComponent[] = [];
 
   for (const sig of builtinFileSignatures) {
@@ -84,7 +86,7 @@ export async function scanRepository(root: string): Promise<Inventory> {
         /(package\.json|pyproject\.toml|requirements\.txt|\.tf$|\.ya?ml$|\.ts$|\.js$|\.py$|\.sql$)/.test(f) ||
         isEnvFile(f)
     )
-    .filter((f) => f !== "fde.yaml" && !f.endsWith(`${path.sep}fde.yaml`))
+    .filter((f) => f !== "fde.yaml" && !f.endsWith("/fde.yaml"))
     .slice(0, 250);
 
   const signals: ScanSignals = { regions: [], secretSuspects: [], writeSignals: [] };

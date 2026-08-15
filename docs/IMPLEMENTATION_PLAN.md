@@ -208,7 +208,7 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 - [x] Unit + e2e test baseline (`pnpm test`, node:test + tsx)
 - [x] Fixture repositories per scanner family (false-positive regression suite) — `tests/fixtures.test.ts`; already caught and fixed one real FP (`aws_` matching `flaws_found`)
 - [x] Golden-file tests for report/Mermaid/JSON outputs — `tests/golden.test.ts` + `tests/golden/`, regenerate with `UPDATE_GOLDEN=1`
-- [ ] Windows path handling audit (walker and evidence paths currently assume POSIX-style separators in places)
+- [x] Windows path handling audit (walker and evidence paths currently assume POSIX-style separators in places) — repo-relative paths now POSIX-normalized at the scanner boundary; remaining `path.join` uses are filesystem ops where native separators are correct; CI now runs a windows-latest leg (verifies on next push)
 
 ### Security (see `SECURITY.md`)
 
