@@ -76,7 +76,7 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 - [x] `CHANGELOG.md` with `0.1.0` entry
 - [x] Verify `pnpm build && node dist/cli.js` works as an installed binary (`fde` bin path, shebang, `files` field in `package.json`) — verified via `npm pack` + install into a clean directory: `fde --version/init/scan/map/check` all work
 - [ ] Publish `0.1.0` to npm (`npx openfde` / `pnpm dlx openfde` works on a clean machine)
-- [ ] Show HN / launch draft reviewed against actual output
+- [ ] Show HN / launch draft reviewed against actual output — draft written against captured real output in `docs/LAUNCH_DRAFT.md`; awaiting human review + npm publish
 
 **Exit criterion:** a stranger can run `npx openfde init && npx openfde scan .` on their repo and get the documented experience without cloning this repo.
 
