@@ -82,7 +82,7 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 ---
 
-## Stage 1 — v0.2: Policy-aware Preflight
+## Stage 1 — v0.2: Policy-aware Preflight ✅ (pending: one live GitHub Action run)
 
 > Goal: `fde.yaml` becomes a validated, richer contract, and `fde check` becomes usable as a CI gate.
 
@@ -125,7 +125,7 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 ---
 
-## Stage 2 — v0.3: Agent Deployment Validation
+## Stage 2 — v0.3: Agent Deployment Validation ✅
 
 > Goal: OpenFDE understands AI-agent-shaped systems: what tools they hold, what they may touch, and how they are evaluated.
 
@@ -157,7 +157,7 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 ---
 
-## Stage 3 — v0.4: Production Evidence
+## Stage 3 — v0.4: Production Evidence ✅
 
 > Goal: close the loop after deployment — import what actually happened and attach it to the engagement as evidence.
 
@@ -172,7 +172,7 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 ---
 
-## Stage 4 — v0.5: Handoff
+## Stage 4 — v0.5: Handoff ✅
 
 > Goal: an engagement can be handed to another engineer or the customer without losing context.
 
@@ -190,11 +190,18 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 > Goal: the six pillars (Discover, Model, Govern, Validate, Operate, Compound) are all served by stable commands, and the ecosystem can grow without core changes.
 
-- [ ] Dynamic plugin loader implementing the v0.2 contract (capability prompts before first run)
+> **Deliberately not implemented autonomously (2026-08-16):** these are
+> maintainer decisions gated on real-user feedback from `0.1.0` — freezing a
+> schema, publishing release/deprecation policies, and shipping a loader for
+> third-party code should not happen before anyone has used the tool. The
+> loader's prerequisite threat model now exists (`docs/THREAT_MODEL_PLUGINS.md`)
+> and defines its ship criteria.
+
+- [ ] Dynamic plugin loader implementing the v0.2 contract (capability prompts before first run) — must meet the ship criteria in `docs/THREAT_MODEL_PLUGINS.md`
 - [ ] Recipe format + `fde recipe use <name>` (architecture, policies, evals, contracts, runbooks as a reusable unit)
-- [ ] `fde extract` — turn a finished engagement into a sanitized recipe (redaction enforced)
+- [ ] `fde extract` — turn a finished engagement into a sanitized recipe (redaction enforced; `src/core/redact.ts` is the shared utility to use)
 - [ ] Schema `v1` freeze with documented migration from `v1alpha1`
-- [ ] Community surfaces: contribution guides for scanners, check packs, recipes, integration fixtures
+- [ ] Community surfaces: contribution guides for scanners, check packs, recipes, integration fixtures — scanners (`docs/WRITING_A_SCANNER.md`) and check packs (`docs/WRITING_A_CHECK.md`) done; recipes/fixtures pending the recipe format
 - [ ] 1.0 release: semver policy, deprecation policy, security disclosure process
 
 **Exit criterion:** knowledge from engagement #1 measurably accelerates engagement #10 via recipes and plugins, with no customer data leaking between them.
@@ -213,7 +220,7 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 ### Security (see `SECURITY.md`)
 
 - [x] No telemetry, no network calls, local-first (verified: zero network code in `src/`)
-- [ ] Threat-model doc for the plugin loader before it ships
+- [x] Threat-model doc for the plugin loader before it ships (`docs/THREAT_MODEL_PLUGINS.md` — includes ship criteria the loader must meet)
 - [x] Redaction utilities shared by evidence/handoff/extract features (`src/core/redact.ts`, used by evidence + trace/incident import)
 
 ### Docs & community
@@ -227,6 +234,13 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 ## Suggested execution order (next 3 milestones)
 
-1. **Ship `0.1.0`** — finish the "Remaining V0.1 polish" checklist. Everything else is blocked on real-user feedback this release generates.
-2. **Stage 1.1 + 1.4 first** (schema validation + JSON output + exit codes): smallest slice that makes OpenFDE adoptable in CI, which drives the early-validation metrics in `PROJECT_PLAN.md`.
-3. **Stage 1.2 checks** next, prioritized by scanner false-positive feedback from real repos.
+_Status 2026-08-16: Stages 1–4 are implemented and tested (82 tests). What
+remains is user-gated:_
+
+1. **Ship `0.1.0`** — `npm publish` (needs maintainer credentials), README
+   quickstart GIF, review `docs/LAUNCH_DRAFT.md`. Everything else is blocked
+   on real-user feedback this release generates.
+2. **Push to GitHub** — verifies the composite Action (`action.yml`) and the
+   `windows-latest` CI leg, closing the last Stage 1 item.
+3. **Stage 5 after feedback** — loader (per `docs/THREAT_MODEL_PLUGINS.md`
+   ship criteria), recipes, schema freeze, release policies.

@@ -4,12 +4,12 @@ Thanks for helping make Forward Deployed Engineering more repeatable.
 
 ## Good first contribution areas
 
-- add a repository scanner;
+- add a repository scanner — tutorial: [`docs/WRITING_A_SCANNER.md`](docs/WRITING_A_SCANNER.md);
+- add an explainable preflight check — tutorial: [`docs/WRITING_A_CHECK.md`](docs/WRITING_A_CHECK.md);
 - improve detection evidence;
-- add an explainable preflight check;
-- improve the example engagement;
-- add tests around false positives;
-- improve Markdown/terminal output;
+- add an example engagement to [`examples/`](examples/) (each README documents the exact findings it produces);
+- add tests around false positives (`tests/fixtures.test.ts`);
+- improve Markdown/terminal output (golden files: `tests/golden/`);
 - propose schema fields with a concrete engagement use case.
 
 ## Contribution principles
