@@ -88,10 +88,10 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 ### 1.1 Schema validation
 
-- [ ] Wire [`schemas/fde.schema.json`](../schemas/fde.schema.json) into the loader (validate on every `check`/`map`/`report`)
-- [ ] `fde validate` command (or `fde check --schema-only`) with line-level error messages
-- [ ] Keep schema and `docs/FDE_SCHEMA.md` in sync; add schema version handling (`apiVersion`)
-- [ ] Tests: valid/invalid fixture files, unknown-field warnings
+- [x] Wire [`schemas/fde.schema.json`](../schemas/fde.schema.json) into the loader (validate on every `check`/`map`/`report`)
+- [x] `fde validate` command (or `fde check --schema-only`) with line-level error messages
+- [x] Keep schema and `docs/FDE_SCHEMA.md` in sync; add schema version handling (`apiVersion`)
+- [x] Tests: valid/invalid fixture files, unknown-field warnings
 
 ### 1.2 Richer constraints
 

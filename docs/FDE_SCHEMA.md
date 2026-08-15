@@ -39,13 +39,36 @@ spec:
 
 ```yaml
 spec:
-  successMetrics: []
-  environment: {}
-  systems: []
-  constraints: {}
-  reliability: {}
-  evaluation: {}
+  successMetrics: []          # [{ name, target }]
+  environment: {}             # { cloud, regions: [] }
+  systems: []                 # [{ id, type, access: read_only|read_write|unknown }]
+  constraints:
+    dataResidency:
+      allowedRegions: []      # region ids, e.g. ap-southeast-1
+    pii:
+      allowExternalModel: false
+    humanApproval:
+      requiredFor: []         # side-effecting action ids, e.g. refund.execute
+  reliability:
+    timeout: 30s
+    retry: exponential-backoff
+    fallback: human-escalation
+  evaluation:
+    required: true
 ```
+
+## Validation
+
+`fde validate` checks `fde.yaml` against
+[`schemas/fde.schema.json`](../schemas/fde.schema.json) and reports errors with
+`fde.yaml:line:col` positions. The same validation runs automatically inside
+`fde map`, `fde check`, and `fde report`; schema errors abort the command.
+
+- The current schema version is `apiVersion: openfde.dev/v1alpha1`. Any other
+  value is an error naming the supported version.
+- Unknown fields inside known objects (e.g. a typo under `spec`) produce
+  **warnings**, not errors, so the file can carry forward-looking data.
+- Unknown **top-level** fields are errors — the root of the document is closed.
 
 ## Future schema candidates
 
