@@ -8,7 +8,7 @@ import { checkCommand } from "./commands/check.js";
 import { reportCommand } from "./commands/report.js";
 
 const program = new Command();
-program.name("fde").description("OpenFDE delivery harness").version("0.1.0-alpha.0");
+program.name("fde").description("OpenFDE delivery harness").version("0.1.0");
 
 const normalize = (root?: string) => path.resolve(root ?? process.cwd());
 

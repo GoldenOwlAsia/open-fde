@@ -73,8 +73,8 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 ### Remaining V0.1 polish (release blockers for `0.1.0`)
 
 - [ ] README quickstart GIF / screenshot (placeholders exist)
-- [ ] `CHANGELOG.md` with `0.1.0` entry
-- [ ] Verify `pnpm build && node dist/cli.js` works as an installed binary (`fde` bin path, shebang, `files` field in `package.json`)
+- [x] `CHANGELOG.md` with `0.1.0` entry
+- [x] Verify `pnpm build && node dist/cli.js` works as an installed binary (`fde` bin path, shebang, `files` field in `package.json`) — verified via `npm pack` + install into a clean directory: `fde --version/init/scan/map/check` all work
 - [ ] Publish `0.1.0` to npm (`npx openfde` / `pnpm dlx openfde` works on a clean machine)
 - [ ] Show HN / launch draft reviewed against actual output
 
