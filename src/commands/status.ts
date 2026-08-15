@@ -1,7 +1,6 @@
-import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { loadEngagement } from "../core/engagement.js";
-import { exists, readJson } from "../core/workspace.js";
+import { exists, readJson, readJsonDir } from "../core/workspace.js";
 import type { NormalizedIncident, NormalizedTrace } from "./importCmd.js";
 import type { EvidenceIndexEntry } from "./evidence.js";
 
@@ -19,26 +18,12 @@ export interface StatusSummary {
   lastImportAt?: string;
 }
 
-async function listJson<T>(dir: string): Promise<T[]> {
-  if (!(await exists(dir))) return [];
-  const files = (await readdir(dir)).filter((f) => f.endsWith(".json") && f !== "index.json").sort();
-  const items: T[] = [];
-  for (const file of files) {
-    try {
-      items.push(await readJson<T>(path.join(dir, file)));
-    } catch {
-      // unreadable artifact — skip rather than fail the whole status
-    }
-  }
-  return items;
-}
-
 export async function statusCommand(root: string): Promise<StatusSummary> {
   const engagement = await loadEngagement(root);
   const ws = path.join(root, ".fde");
 
-  const traces = await listJson<NormalizedTrace>(path.join(ws, "traces"));
-  const incidents = await listJson<NormalizedIncident>(path.join(ws, "incidents"));
+  const traces = await readJsonDir<NormalizedTrace>(path.join(ws, "traces"));
+  const incidents = await readJsonDir<NormalizedIncident>(path.join(ws, "incidents"));
   const evidenceIndexPath = path.join(ws, "evidence", "index.json");
   const evidence = (await exists(evidenceIndexPath)) ? await readJson<EvidenceIndexEntry[]>(evidenceIndexPath) : [];
 

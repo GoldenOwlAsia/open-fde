@@ -1,7 +1,7 @@
 import type { CheckResult, Finding, Inventory } from "../core/types.js";
 import type { Engagement } from "../core/engagement.js";
 
-const OPEN_QUESTIONS: Record<string, string> = {
+export const OPEN_QUESTIONS: Record<string, string> = {
   "external-model-policy-undefined": "May customer data be sent to an external model provider?",
   "pii-policy-undefined": "How must personally identifiable information be handled in this engagement?",
   "human-approval-undefined": "Which side-effecting actions require human approval before execution?",

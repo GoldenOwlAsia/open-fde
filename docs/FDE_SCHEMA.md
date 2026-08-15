@@ -49,6 +49,9 @@ spec:
       allowExternalModel: false
     humanApproval:
       requiredFor: []         # side-effecting action ids, e.g. refund.execute
+  ownership:
+    owner: Phil               # who owns this engagement after handoff
+    contacts: []              # [{ name, role, contact }]
   agents: []                  # see "Agent declarations" below
   reliability:
     timeout: 30s

@@ -56,6 +56,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `fde import incident` (normalized records linked to declared systems),
   `fde replay <trace>` (recorded trace vs contract fixtures, no production
   calls), and `fde status` (declared vs observed summary).
+- Handoff (v0.5 scope): `fde decision add` (numbered ADRs),
+  `fde learning add` (known-failure-modes registry whose entries annotate
+  matching findings as evidence), and `fde handoff` (handoff.md +
+  handoff.json manifest + generated deploy/rollback/incident-triage runbook
+  skeletons; `spec.ownership` in the schema).
 
 ### Fixed
 

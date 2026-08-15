@@ -3,6 +3,7 @@ import { ensureWorkspace, exists, readJson, writeJson } from "../core/workspace.
 import type { CheckResult, Finding, Inventory, Severity } from "../core/types.js";
 import { loadEngagement } from "../core/engagement.js";
 import { builtinChecks, runDefaultChecks } from "../checks/defaultChecks.js";
+import { annotateFindingsWithLearnings, loadLearnings } from "../core/learnings.js";
 import { toSarif } from "../report/sarif.js";
 import { VERSION } from "../version.js";
 
@@ -54,10 +55,11 @@ export async function checkCommand(root: string, options: CheckCommandOptions = 
 
   const inventory = await readJson<Inventory>(invPath);
   const engagement = await loadEngagement(root);
-  const result = await runDefaultChecks(inventory, engagement, {
+  const raw = await runDefaultChecks(inventory, engagement, {
     only: parseIds(options.only),
     skip: parseIds(options.skip)
   });
+  const result = annotateFindingsWithLearnings(raw, await loadLearnings(root));
   await writeJson(path.join(ws, "check-result.json"), result);
 
   if (format === "json") {

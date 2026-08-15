@@ -14,6 +14,9 @@ import { evidenceAddCommand } from "./commands/evidence.js";
 import { importIncidentCommand, importTraceCommand } from "./commands/importCmd.js";
 import { replayCommand } from "./commands/replay.js";
 import { statusCommand } from "./commands/status.js";
+import { decisionAddCommand } from "./commands/decision.js";
+import { learningAddCommand } from "./commands/learning.js";
+import { handoffCommand } from "./commands/handoff.js";
 import { VERSION } from "./version.js";
 
 const program = new Command();
@@ -99,6 +102,42 @@ program
   .argument("[root]")
   .action(async (root) => {
     await statusCommand(normalize(root));
+  });
+
+const decision = program.command("decision").description("Architecture decision records");
+decision
+  .command("add")
+  .description("Record an ADR in .fde/architecture/decisions/")
+  .argument("<title>", "decision title")
+  .argument("[root]")
+  .option("--status <status>", "proposed | accepted | superseded", "accepted")
+  .option("--context <text>", "what motivates this decision")
+  .option("--decision <text>", "what was decided")
+  .option("--consequences <text>", "what becomes easier/harder")
+  .action(async (title, root, options) => {
+    await decisionAddCommand(normalize(root), title, options);
+  });
+
+const learning = program.command("learning").description("Known-failure-modes registry");
+learning
+  .command("add")
+  .description("Record a known failure mode in .fde/learnings/")
+  .argument("<title>", "learning title")
+  .argument("[root]")
+  .option("--failure-mode <text>", "how it fails")
+  .option("--mitigation <text>", "how to prevent or recover")
+  .option("--checks <ids>", "comma-separated check ids this learning relates to")
+  .option("--incidents <ids>", "comma-separated incident ids this learning came from")
+  .action(async (title, root, options) => {
+    await learningAddCommand(normalize(root), title, options);
+  });
+
+program
+  .command("handoff")
+  .description("Generate the handoff package (handoff.md + handoff.json + runbook skeletons)")
+  .argument("[root]")
+  .action(async (root) => {
+    await handoffCommand(normalize(root));
   });
 program.command("report").argument("[root]").action(async (root) => reportCommand(normalize(root)));
 

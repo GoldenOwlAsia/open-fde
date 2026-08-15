@@ -100,6 +100,25 @@
           },
           "additionalProperties": true
         },
+        "ownership": {
+          "type": "object",
+          "properties": {
+            "owner": { "type": "string" },
+            "contacts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "role": { "type": "string" },
+                  "contact": { "type": "string" }
+                },
+                "additionalProperties": true
+              }
+            }
+          },
+          "additionalProperties": true
+        },
         "agents": {
           "type": "array",
           "items": {

@@ -176,11 +176,11 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 > Goal: an engagement can be handed to another engineer or the customer without losing context.
 
-- [ ] `fde decision add` — lightweight ADR flow into `.fde/architecture/decisions/`
-- [ ] Known-failure-modes registry (`.fde/learnings/`), linked from findings/incidents
-- [ ] `fde handoff` — generates the handoff package: ownership, unresolved risks, open questions, runbook index
-- [ ] Runbook generator: skeleton runbooks from graph + checks (deploy, rollback, incident triage)
-- [ ] Machine-readable handoff manifest (`handoff.json`) + human Markdown pair
+- [x] `fde decision add` — lightweight ADR flow into `.fde/architecture/decisions/` (sequential numbering, non-interactive flags)
+- [x] Known-failure-modes registry (`.fde/learnings/`), linked from findings/incidents — `fde learning add`; learnings linked via `--checks` are attached as evidence on matching findings in every `fde check`
+- [x] `fde handoff` — generates the handoff package: ownership (`spec.ownership`), unresolved risks, open questions, runbook index
+- [x] Runbook generator: skeleton runbooks from graph + checks (deploy, rollback, incident triage) — existing runbooks never overwritten
+- [x] Machine-readable handoff manifest (`handoff.json`) + human Markdown pair
 
 **Exit criterion:** a second engineer can pick up an engagement from `.fde/` alone and know the architecture decisions, risks, and operational procedures.
 

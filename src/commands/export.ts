@@ -6,6 +6,7 @@ import { engagementPath, loadEngagement } from "../core/engagement.js";
 import { buildGraph, renderMermaid } from "../core/graph.js";
 import { scanRepository } from "../scanners/repo.js";
 import { runDefaultChecks } from "../checks/defaultChecks.js";
+import { annotateFindingsWithLearnings, loadLearnings } from "../core/learnings.js";
 import { VERSION } from "../version.js";
 
 // `fde export context` bundles everything a coding agent needs about the
@@ -32,7 +33,10 @@ async function gather(root: string): Promise<ContextBundle> {
   const inventory = (await exists(invPath)) ? await readJson<Inventory>(invPath) : await scanRepository(root);
 
   const graph = buildGraph(inventory, engagement, root);
-  const checkResult = await runDefaultChecks(inventory, engagement);
+  const checkResult = annotateFindingsWithLearnings(
+    await runDefaultChecks(inventory, engagement),
+    await loadLearnings(root)
+  );
 
   return {
     generatedAt: new Date().toISOString(),

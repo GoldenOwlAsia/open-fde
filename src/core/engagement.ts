@@ -51,6 +51,10 @@ export interface Engagement {
       pii?: { allowExternalModel?: boolean };
       humanApproval?: { requiredFor?: string[] };
     };
+    ownership?: {
+      owner?: string;
+      contacts?: Array<{ name?: string; role?: string; contact?: string }>;
+    };
     agents?: EngagementAgent[];
     reliability?: { timeout?: string; retry?: string; fallback?: string };
     evaluation?: { required?: boolean; suites?: EvalSuite[] };

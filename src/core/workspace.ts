@@ -1,4 +1,4 @@
-import { mkdir, writeFile, readFile, access } from "node:fs/promises";
+import { mkdir, writeFile, readFile, access, readdir } from "node:fs/promises";
 import path from "node:path";
 
 export const workspacePath = (root: string) => path.join(root, ".fde");
@@ -35,4 +35,19 @@ export async function exists(filePath: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+/** Reads every parseable *.json in a directory (skipping index.json). */
+export async function readJsonDir<T>(dir: string): Promise<T[]> {
+  if (!(await exists(dir))) return [];
+  const files = (await readdir(dir)).filter((f) => f.endsWith(".json") && f !== "index.json").sort();
+  const items: T[] = [];
+  for (const file of files) {
+    try {
+      items.push(await readJson<T>(path.join(dir, file)));
+    } catch {
+      // unreadable artifact — skip rather than fail the caller
+    }
+  }
+  return items;
 }
