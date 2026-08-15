@@ -25,6 +25,26 @@ spec:
       type: postgres
       access: read_only
 
+  agents:
+    - id: support_agent
+      description: Answers tickets, holding tools against the customer database
+      tools:
+        - id: lookup_customer
+          system: customer_db
+          access: read_only
+          containsPii: true
+        # read_write against a read_only system → critical
+        # agent-access-exceeds-boundary
+        - id: record_resolution
+          system: customer_db
+          access: read_write
+        # side-effecting with no humanApproval entry → critical
+        # agent-side-effect-unapproved; and "payments" is not declared under
+        # spec.systems → agent-tool-system-undeclared warning
+        - id: issue_refund
+          system: payments
+          sideEffects: true
+
   constraints:
     dataResidency:
       allowedRegions: [ap-southeast-1]
@@ -42,3 +62,8 @@ spec:
 
   evaluation:
     required: true
+    suites:
+      - name: ticket-regression
+        type: regression
+        location: evals/ticket-regression
+        requiredBeforeDeploy: true

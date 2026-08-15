@@ -49,13 +49,41 @@ spec:
       allowExternalModel: false
     humanApproval:
       requiredFor: []         # side-effecting action ids, e.g. refund.execute
+  agents: []                  # see "Agent declarations" below
   reliability:
     timeout: 30s
     retry: exponential-backoff
     fallback: human-escalation
   evaluation:
     required: true
+    suites: []                # see docs/EVALS.md
 ```
+
+## Agent declarations
+
+AI agents declare what tools they hold and what each tool may touch:
+
+```yaml
+spec:
+  agents:
+    - id: support_agent
+      description: Answers tickets
+      tools:
+        - id: lookup_customer
+          system: customer_db     # must reference a spec.systems[].id
+          access: read_only       # read_only | read_write | unknown
+          sideEffects: false
+          containsPii: true
+```
+
+This feeds three things:
+
+- `fde map` renders `agent → tool → system` edges with access and PII flags.
+- `agent-side-effect-unapproved` (critical): a `sideEffects: true` tool whose
+  id (or `agentId.toolId`) is not listed in `humanApproval.requiredFor`.
+- `agent-access-exceeds-boundary` (critical): a tool writing to a system
+  declared `read_only`; `agent-tool-system-undeclared` (warning): a tool
+  pointing at a system with no `spec.systems` entry.
 
 ## Check severity overrides
 

@@ -1,0 +1,3 @@
+{"case": "billing question", "expected": "resolved", "actual": "resolved", "pass": true}
+{"case": "refund request", "expected": "escalated", "actual": "escalated", "pass": true}
+{"case": "angry customer", "expected": "escalated", "actual": "resolved", "pass": false}

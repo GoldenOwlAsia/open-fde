@@ -13,7 +13,7 @@ const finding = (severity: Finding["severity"]): Finding => ({
   explanation: "x"
 });
 
-test("shouldFail implements the --fail-on policy", () => {
+test("shouldFail implements the --fail-on policy", async () => {
   assert.equal(shouldFail([finding("critical")], "critical"), true);
   assert.equal(shouldFail([finding("warning")], "critical"), false);
   assert.equal(shouldFail([finding("warning")], "warning"), true);
@@ -22,7 +22,7 @@ test("shouldFail implements the --fail-on policy", () => {
   assert.equal(shouldFail([], "warning"), false);
 });
 
-test("SARIF output is valid 2.1.0 with rules, levels, and file locations", () => {
+test("SARIF output is valid 2.1.0 with rules, levels, and file locations", async () => {
   const inventory: Inventory = {
     generatedAt: "",
     root: "/repo",
@@ -33,7 +33,7 @@ test("SARIF output is valid 2.1.0 with rules, levels, and file locations", () =>
       writeSignals: []
     }
   };
-  const result = runDefaultChecks(inventory, null);
+  const result = await runDefaultChecks(inventory, null);
   const sarif = toSarif(result, builtinChecks, "0.1.0") as {
     version: string;
     runs: Array<{
@@ -67,8 +67,8 @@ test("SARIF output is valid 2.1.0 with rules, levels, and file locations", () =>
   assert.equal(pii.locations[0].physicalLocation.artifactLocation.uri, "fde.yaml");
 });
 
-test("check-result JSON shape is stable", () => {
-  const result = runDefaultChecks({ generatedAt: "", root: "/repo", components: [] }, null);
+test("check-result JSON shape is stable", async () => {
+  const result = await runDefaultChecks({ generatedAt: "", root: "/repo", components: [] }, null);
   assert.deepEqual(Object.keys(result).sort(), ["findings", "generatedAt", "overallScore", "scores"]);
   for (const f of result.findings) {
     assert.ok(f.id && f.title && f.severity && f.category && f.explanation);

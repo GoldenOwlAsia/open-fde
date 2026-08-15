@@ -54,7 +54,7 @@ export async function checkCommand(root: string, options: CheckCommandOptions = 
 
   const inventory = await readJson<Inventory>(invPath);
   const engagement = await loadEngagement(root);
-  const result = runDefaultChecks(inventory, engagement, {
+  const result = await runDefaultChecks(inventory, engagement, {
     only: parseIds(options.only),
     skip: parseIds(options.skip)
   });

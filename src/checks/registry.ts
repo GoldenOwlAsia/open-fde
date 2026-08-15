@@ -4,6 +4,8 @@ import type { Engagement } from "../core/engagement.js";
 export interface CheckContext {
   inventory: Inventory;
   engagement: Engagement | null;
+  /** Engagement root directory, for checks that verify artifacts on disk. */
+  root: string;
 }
 
 // The internal check contract. This is the same shape the future plugin
@@ -16,7 +18,7 @@ export interface Check {
   /** Cheap predicate deciding whether the check is relevant for this context. */
   appliesTo: (context: CheckContext) => boolean;
   /** Runs the check; returns zero or more findings, each carrying evidence. */
-  run: (context: CheckContext) => Finding[];
+  run: (context: CheckContext) => Finding[] | Promise<Finding[]>;
 }
 
 export interface RunOptions {
@@ -94,11 +96,15 @@ function applyOverrides(findings: Finding[], checks: Check[], engagement: Engage
   });
 }
 
-export function runChecks(checks: Check[], context: CheckContext, options: RunOptions = {}): CheckResult {
+export async function runChecks(
+  checks: Check[],
+  context: CheckContext,
+  options: RunOptions = {}
+): Promise<CheckResult> {
   const findings: Finding[] = [];
   for (const check of selectChecks(checks, options)) {
     if (!check.appliesTo(context)) continue;
-    findings.push(...check.run(context));
+    findings.push(...(await check.run(context)));
   }
 
   const finalFindings = applyOverrides(findings, checks, context.engagement);

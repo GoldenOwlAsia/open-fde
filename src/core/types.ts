@@ -7,6 +7,8 @@ export type ComponentCategory =
   | "observability"
   | "auth"
   | "cicd"
+  | "agent"
+  | "tool"
   | "other";
 
 export interface DetectedComponent {

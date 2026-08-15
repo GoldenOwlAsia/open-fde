@@ -3,6 +3,8 @@ import type { Engagement } from "../core/engagement.js";
 import type { Check, CheckContext, RunOptions } from "./registry.js";
 import { runChecks } from "./registry.js";
 import { constraintChecks } from "./constraintChecks.js";
+import { agentChecks } from "./agentChecks.js";
+import { evalChecks } from "./evalChecks.js";
 
 const OBSERVABILITY_SYSTEM_TYPES = new Set(["sentry", "opentelemetry", "otel", "datadog"]);
 
@@ -166,13 +168,13 @@ export const defaultChecks: Check[] = [
   reliability
 ];
 
-export const builtinChecks: Check[] = [...defaultChecks, ...constraintChecks];
+export const builtinChecks: Check[] = [...defaultChecks, ...constraintChecks, ...agentChecks, ...evalChecks];
 
 export function runDefaultChecks(
   inventory: Inventory,
   engagement: Engagement | null,
   options: RunOptions = {}
-): CheckResult {
-  const context: CheckContext = { inventory, engagement };
+): Promise<CheckResult> {
+  const context: CheckContext = { inventory, engagement, root: inventory.root };
   return runChecks(builtinChecks, context, options);
 }

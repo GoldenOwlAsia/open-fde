@@ -131,16 +131,16 @@ It expands [`ROADMAP.md`](ROADMAP.md) into concrete, checkable work items.
 
 ### 2.1 Tool / permission graph
 
-- [ ] Extend `fde.yaml`: agent declarations (tools, per-tool access, side-effecting flags)
-- [ ] Enrich integration graph with `agent → tool → system` edges, including `containsPii` where declared
-- [ ] Check: side-effecting tool without a matching `humanApproval.requiredFor` entry (critical)
-- [ ] Check: agent granted broader access than the declared system boundary (e.g. tool writes to a `read_only` system)
+- [x] Extend `fde.yaml`: agent declarations (tools, per-tool access, side-effecting flags)
+- [x] Enrich integration graph with `agent → tool → system` edges, including `containsPii` where declared
+- [x] Check: side-effecting tool without a matching `humanApproval.requiredFor` entry (critical)
+- [x] Check: agent granted broader access than the declared system boundary (e.g. tool writes to a `read_only` system) — plus `agent-tool-system-undeclared` (warning) for tools pointing at systems with no declared boundary at all
 
 ### 2.2 Eval declarations
 
-- [ ] `fde.yaml` eval schema: suite name, type (regression / task-success), location, required-before-deploy flag
-- [ ] `fde check` verifies declared eval artifacts exist on disk (existence + freshness, not execution — eval *execution* stays out of scope per `MVP_PLAN.md`)
-- [ ] `.fde/evals/` conventions documented
+- [x] `fde.yaml` eval schema: suite name, type (regression / task-success), location, required-before-deploy flag
+- [x] `fde check` verifies declared eval artifacts exist on disk (existence + freshness, not execution — eval *execution* stays out of scope per `MVP_PLAN.md`) — `eval-artifact-missing` + `eval-artifact-stale` (`maxAgeDays`)
+- [x] `.fde/evals/` conventions documented (`docs/EVALS.md`)
 
 ### 2.3 Contract tests
 

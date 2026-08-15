@@ -10,6 +10,32 @@ export interface EngagementSystem {
   access?: string;
 }
 
+export interface AgentTool {
+  id?: string;
+  description?: string;
+  /** References a spec.systems[].id */
+  system?: string;
+  access?: string;
+  sideEffects?: boolean;
+  containsPii?: boolean;
+}
+
+export interface EngagementAgent {
+  id?: string;
+  description?: string;
+  tools?: AgentTool[];
+}
+
+export interface EvalSuite {
+  name?: string;
+  type?: string;
+  /** Path (relative to the engagement root) of the eval artifact file or directory. */
+  location?: string;
+  requiredBeforeDeploy?: boolean;
+  /** Freshness bound: warn when the artifact is older than this many days. */
+  maxAgeDays?: number;
+}
+
 export interface Engagement {
   apiVersion?: string;
   kind?: string;
@@ -25,8 +51,9 @@ export interface Engagement {
       pii?: { allowExternalModel?: boolean };
       humanApproval?: { requiredFor?: string[] };
     };
+    agents?: EngagementAgent[];
     reliability?: { timeout?: string; retry?: string; fallback?: string };
-    evaluation?: { required?: boolean };
+    evaluation?: { required?: boolean; suites?: EvalSuite[] };
     checks?: {
       overrides?: Array<{ id?: string; severity?: string; reason?: string }>;
     };

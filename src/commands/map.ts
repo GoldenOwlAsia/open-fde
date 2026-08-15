@@ -61,13 +61,44 @@ export async function mapCommand(root: string): Promise<void> {
     }));
 
   // Declared systems with no detected counterpart still belong on the map.
+  // Track which graph node represents each declared system id so agent tools
+  // can point at it.
+  const systemNodeIds = new Map<string, string>();
   for (const system of systems) {
     const type = system.type?.toLowerCase();
-    if (!type || nodes.some((n) => n.id === type)) continue;
+    if (!type) continue;
+    if (nodes.some((n) => n.id === type)) {
+      if (system.id) systemNodeIds.set(system.id, type);
+      continue;
+    }
     const id = system.id ?? type;
+    if (system.id) systemNodeIds.set(system.id, id);
     if (nodes.some((n) => n.id === id)) continue;
     nodes.push({ id, label: `${system.id ?? type} (declared)`, category: SYSTEM_TYPE_CATEGORIES[type] ?? "other" });
     edges.push({ from: appId, to: id, relationship: "declared", access: normalizeAccess(system.access) });
+  }
+
+  // Declared agents: agent → tool → system edges with access and PII flags.
+  for (const agent of engagement?.spec?.agents ?? []) {
+    if (!agent.id) continue;
+    nodes.push({ id: agent.id, label: agent.id, category: "agent" });
+    edges.push({ from: appId, to: agent.id, relationship: "runs" });
+    for (const tool of agent.tools ?? []) {
+      if (!tool.id) continue;
+      const toolNodeId = `${agent.id}.${tool.id}`;
+      nodes.push({ id: toolNodeId, label: tool.id, category: "tool" });
+      edges.push({ from: agent.id, to: toolNodeId, relationship: "holds" });
+      const target = tool.system ? systemNodeIds.get(tool.system) : undefined;
+      if (!target) continue; // undeclared refs are surfaced by `fde check`
+      const edge: GraphEdge = {
+        from: toolNodeId,
+        to: target,
+        relationship: tool.sideEffects ? "uses (side-effecting)" : "uses",
+        access: normalizeAccess(tool.access)
+      };
+      if (tool.containsPii !== undefined) edge.containsPii = tool.containsPii;
+      edges.push(edge);
+    }
   }
 
   const graph: IntegrationGraph = { generatedAt: new Date().toISOString(), nodes, edges };

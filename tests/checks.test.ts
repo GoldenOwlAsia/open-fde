@@ -19,8 +19,8 @@ const fullEngagement: Engagement = {
   }
 };
 
-test("missing engagement produces the default findings", () => {
-  const result = runDefaultChecks(emptyInventory, null);
+test("missing engagement produces the default findings", async () => {
+  const result = await runDefaultChecks(emptyInventory, null);
   const ids = result.findings.map((f) => f.id).sort();
   assert.deepEqual(ids, [
     "evaluation-not-declared",
@@ -33,13 +33,13 @@ test("missing engagement produces the default findings", () => {
   assert.equal(result.findings.find((f) => f.id === "pii-policy-undefined")?.severity, "critical");
 });
 
-test("fully declared engagement passes all checks", () => {
-  const result = runDefaultChecks(emptyInventory, fullEngagement);
+test("fully declared engagement passes all checks", async () => {
+  const result = await runDefaultChecks(emptyInventory, fullEngagement);
   assert.deepEqual(result.findings, []);
   assert.equal(result.overallScore, 100);
 });
 
-test("detected AI provider without external model policy is flagged", () => {
+test("detected AI provider without external model policy is flagged", async () => {
   const inventory: Inventory = {
     generatedAt: "",
     root: "/repo",
@@ -47,13 +47,13 @@ test("detected AI provider without external model policy is flagged", () => {
       { id: "openai", name: "OpenAI", category: "ai", evidence: ["package.json"], confidence: "medium" }
     ]
   };
-  const result = runDefaultChecks(inventory, null);
+  const result = await runDefaultChecks(inventory, null);
   const finding = result.findings.find((f) => f.id === "external-model-policy-undefined");
   assert.ok(finding);
   assert.ok(finding.evidence?.some((e) => e.includes("package.json")));
 });
 
-test("declared external model policy silences the security check", () => {
+test("declared external model policy silences the security check", async () => {
   const inventory: Inventory = {
     generatedAt: "",
     root: "/repo",
@@ -61,20 +61,20 @@ test("declared external model policy silences the security check", () => {
       { id: "anthropic", name: "Anthropic", category: "ai", evidence: ["src/llm.ts"], confidence: "medium" }
     ]
   };
-  const result = runDefaultChecks(inventory, fullEngagement);
+  const result = await runDefaultChecks(inventory, fullEngagement);
   assert.equal(result.findings.find((f) => f.id === "external-model-policy-undefined"), undefined);
 });
 
-test("empty humanApproval.requiredFor still warns", () => {
+test("empty humanApproval.requiredFor still warns", async () => {
   const engagement: Engagement = {
     spec: { constraints: { humanApproval: { requiredFor: [] } } }
   };
-  const result = runDefaultChecks(emptyInventory, engagement);
+  const result = await runDefaultChecks(emptyInventory, engagement);
   assert.ok(result.findings.some((f) => f.id === "human-approval-undefined"));
 });
 
-test("every finding carries evidence", () => {
-  const result = runDefaultChecks(emptyInventory, null);
+test("every finding carries evidence", async () => {
+  const result = await runDefaultChecks(emptyInventory, null);
   for (const finding of result.findings) {
     assert.ok(finding.evidence && finding.evidence.length > 0, `${finding.id} has no evidence`);
   }
