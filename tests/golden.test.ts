@@ -60,7 +60,12 @@ async function makeFixture(): Promise<string> {
 }
 
 function normalize(content: string, root: string): string {
+  // Inside JSON strings the root appears backslash-escaped on Windows
+  // (C:\\Users\\...), so replace that form as well as the raw one. On POSIX
+  // both forms are identical and this is a no-op.
+  const jsonEscapedRoot = JSON.stringify(root).slice(1, -1);
   return content
+    .replaceAll(jsonEscapedRoot, "<ROOT>")
     .replaceAll(root, "<ROOT>")
     .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/g, "<TIMESTAMP>");
 }
