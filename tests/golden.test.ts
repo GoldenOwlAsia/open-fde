@@ -65,6 +65,7 @@ function normalize(content: string, root: string): string {
   // both forms are identical and this is a no-op.
   const jsonEscapedRoot = JSON.stringify(root).slice(1, -1);
   return content
+    .replaceAll("\r\n", "\n")
     .replaceAll(jsonEscapedRoot, "<ROOT>")
     .replaceAll(root, "<ROOT>")
     .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/g, "<TIMESTAMP>");
@@ -77,7 +78,9 @@ async function assertGolden(name: string, actual: string): Promise<void> {
     await writeFile(goldenPath, actual, "utf8");
     return;
   }
-  const expected = await readFile(goldenPath, "utf8");
+  // Golden files may be CRLF on disk if a checkout converted line endings;
+  // compare content, not the checkout's line-ending policy.
+  const expected = (await readFile(goldenPath, "utf8")).replaceAll("\r\n", "\n");
   assert.equal(actual, expected, `${name} drifted from its golden file (regenerate with UPDATE_GOLDEN=1 if intended)`);
 }
 

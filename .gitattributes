@@ -1,0 +1,3 @@
+# Keep checkouts byte-identical across OSes: OpenFDE writes all generated
+# artifacts with LF, and the golden-file tests compare byte-for-byte.
+* text=auto eol=lf
